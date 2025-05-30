@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cudio Media</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">Cudio Media 🎵</h1>
+      <div class="search-bar">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search for music..."
+          disabled
+        />
+        <button class="material-button" disabled>
+          <span class="material-symbols-outlined">search</span>
+        </button>
+        <p style="font-size: 0.9rem; color: gray">
+          Search is disabled in static mode (GitHub Pages).
+        </p>
+      </div>
+      <div id="results"></div>
+    </div>
+
+    <div id="player" class="hidden">
+      <div id="ytplayer" style="display: none"></div>
+      <div class="player-container">
+        <div class="controls">
+          <button onclick="playVideo()" class="material-button">
+            <span class="material-symbols-outlined">play_arrow</span>
+          </button>
+          <button onclick="pauseVideo()" class="material-button">
+            <span class="material-symbols-outlined">pause</span>
+          </button>
+          <button onclick="stopVideo()" class="material-button">
+            <span class="material-symbols-outlined">stop</span>
+          </button>
+        </div>
+        <div class="progress-container" onclick="seek(event)">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let player;
+      let progressInterval;
+
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player("ytplayer", {
+          height: "0",
+          width: "0",
+          videoId: "",
+          playerVars: { autoplay: 1 },
+          events: {
+            onReady: () => updateProgressBar(),
+          },
+        });
+      }
+
+      function playVideo() {
+        if (player) player.playVideo();
+      }
+
+      function pauseVideo() {
+        if (player) player.pauseVideo();
+      }
+
+      function stopVideo() {
+        if (player) {
+          player.stopVideo();
+          clearInterval(progressInterval);
+          document.getElementById("progressBar").style.width = "0%";
+        }
+      }
+
+      function updateProgressBar() {
+        clearInterval(progressInterval);
+        progressInterval = setInterval(() => {
+          if (player && player.getDuration && player.getCurrentTime) {
+            const duration = player.getDuration();
+            const currentTime = player.getCurrentTime();
+            const progress = (currentTime / duration) * 100;
+            document.getElementById("progressBar").style.width = `${progress}%`;
+          }
+        }, 500);
+      }
+
+      function seek(event) {
+        const container = event.currentTarget;
+        const rect = container.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const percent = x / rect.width;
+        const duration = player.getDuration();
+        player.seekTo(duration * percent, true);
+      }
+
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.body.appendChild(tag);
+    </script>
+  </body>
+</html>
