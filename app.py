@@ -1,7 +1,10 @@
 from flask import Flask, render_template, request, jsonify
 from ytmusicapi import YTMusic
+from flask_cors import CORS  # <-- Import CORS
 
 app = Flask(__name__)
+CORS(app)  # <-- Enable CORS globally
+
 ytmusic = YTMusic()
 
 @app.route('/')
@@ -23,4 +26,5 @@ def search():
     return jsonify(songs)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Run on 0.0.0.0 so Render can access it, port 5000 is default
+    app.run(host='0.0.0.0', port=5000, debug=True)
